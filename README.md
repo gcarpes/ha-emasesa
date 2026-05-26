@@ -16,40 +16,6 @@ Integración para **Home Assistant** que conecta con la API oficial de **EMASESA
 - 🏠 **5 sensores** de consumo listos para automatizaciones
 - ⚡ **Sin dependencias externas** — usa solo librerías incluidas en HA
 
----
-
-## 📋 Requisitos previos
-
-### Entrada en `/etc/hosts`
-La API de EMASESA requiere resolución DNS específica. Añade esta línea al `/etc/hosts` de tu Home Assistant:
-
-```
-94.198.88.141    datosabiertos.emasesa.com
-```
-
-Desde el Terminal de HA:
-```bash
-echo "94.198.88.141    datosabiertos.emasesa.com" >> /etc/hosts
-```
-
-Para que sea permanente tras reinicios, añade en `configuration.yaml`:
-```yaml
-shell_command:
-  fix_emasesa_hosts: "grep -q 'datosabiertos.emasesa.com' /etc/hosts || echo '94.198.88.141 datosabiertos.emasesa.com' >> /etc/hosts"
-```
-
-Y en `automations.yaml`:
-```yaml
-- alias: "EMASESA - Fijar entrada hosts al arrancar"
-  trigger:
-    - platform: homeassistant
-      event: start
-  action:
-    - service: shell_command.fix_emasesa_hosts
-```
-
----
-
 ## 🚀 Instalación
 
 ### Opción 1 — HACS (recomendado)
@@ -122,9 +88,8 @@ days_to_show: 7
 
 ## 🤝 Contribuir
 
-Este proyecto es mantenido por trabajadores de EMASESA para facilitar la monitorización del consumo de agua a los ciudadanos de Sevilla.
-
-Pull requests y issues son bienvenidos.
+Este proyecto lo mantengo en mi tiempo libre, sin ningún tipo de compromiso formal con EMASESA ni con ninguna otra organización. Lo comparto porque creo que puede ser útil para los ciudadanos de Sevilla que quieran monitorizar su consumo de agua.
+Si encuentras algún bug, tienes una idea o quieres mejorar algo, los issues y pull requests son más que bienvenidos. Haré lo que pueda cuando pueda. 😊
 
 ---
 
