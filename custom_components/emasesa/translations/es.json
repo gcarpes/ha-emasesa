@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configurar EMASESA",
+        "description": "Introduce tus credenciales de EMASESA (datosabiertos.emasesa.com)",
+        "data": {
+          "username": "DNI / Usuario",
+          "password": "Contraseña",
+          "contrato": "Número de Contrato",
+          "scan_interval": "Intervalo de actualización (segundos)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Credenciales incorrectas. Verifica tu DNI y contraseña.",
+      "cannot_connect": "No se puede conectar con la API de EMASESA. Comprueba tu conexión.",
+      "unknown": "Error inesperado. Consulta los logs de Home Assistant."
+    },
+    "abort": {
+      "already_configured": "Este contrato ya está configurado en Home Assistant."
+    }
+  }
+}
