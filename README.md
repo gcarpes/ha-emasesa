@@ -53,11 +53,11 @@ Integración para **Home Assistant** que conecta con la API oficial de **EMASESA
 
 | Sensor | Descripción | Unidad |
 |--------|-------------|--------|
-| `sensor.emasesa_consumo_hoy_m3` | Consumo del último día disponible | m³ |
-| `sensor.emasesa_consumo_ayer_m3` | Consumo del día anterior | m³ |
-| `sensor.emasesa_lectura_contador_m3` | Lectura actual del contador | m³ |
-| `sensor.emasesa_consumo_total_periodo_m3` | Consumo total del período | m³ |
-| `sensor.emasesa_consumo_medio_diario_m3` | Consumo medio diario | m³ |
+| `sensor.emasesa_contrato_xxxxxxxxxx_emasesa_consumo_hoy` | Consumo del último día disponible | m³ |
+| `sensor.emasesa_contrato_xxxxxxxxxx_emasesa_consumo_medio_diario` | Consumo medio diario | m³ |
+| `sensor.emasesa_contrato_xxxxxxxxxx_emasesa_estado_contador` | OK INCIDENCIAS |
+| `sensor.emasesa_contrato_xxxxxxxxxx_emasesa_error_contador` | True False posible error de lectura |
+| `ssensor.emasesa_contrato_xxxxxxxxxx_emasesa_consumo_nocturno` | True False posibles fugas |
 
 Además se crea la estadística externa `emasesa:agua_CONTRATO` con el consumo horario histórico, disponible en el **panel de Energía → Agua**.
 
