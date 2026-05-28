@@ -3,7 +3,7 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/Gracarpes/ha-emasesa/releases)
 
-Integración para **Home Assistant** que conecta con la API oficial de **EMASESA** (Empresa Metropolitana de Abastecimiento y Saneamiento de Aguas de Sevilla) para monitorizar el consumo de agua horario en tiempo real.
+Integración para **Home Assistant** que conecta con la API oficial de **EMASESA** (Empresa Metropolitana de Abastecimiento y Saneamiento de Aguas de Sevilla) para monitorizar el consumo de agua del contador inteligente.
 
 ---
 
