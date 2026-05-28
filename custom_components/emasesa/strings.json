@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Configurar EMASESA",
-        "description": "Introduce tus credenciales de EMASESA (datosabiertos.emasesa.com)",
+        "description": "Introduce tus credenciales de EMASESA",
         "data": {
           "username": "DNI / Usuario",
           "password": "Contraseña",
@@ -13,12 +13,12 @@
       }
     },
     "error": {
-      "invalid_auth": "Credenciales incorrectas. Verifica tu DNI y contraseña.",
-      "cannot_connect": "No se puede conectar con la API de EMASESA. Comprueba tu conexión.",
-      "unknown": "Error inesperado. Consulta los logs de Home Assistant."
+      "invalid_auth": "Credenciales incorrectas.",
+      "cannot_connect": "No se puede conectar con EMASESA.",
+      "unknown": "Error inesperado."
     },
     "abort": {
-      "already_configured": "Este contrato ya está configurado en Home Assistant."
+      "already_configured": "Este contrato ya está configurado."
     }
   }
 }

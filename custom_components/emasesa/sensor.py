@@ -37,37 +37,7 @@ SENSORS: tuple[EmasesaSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.TOTAL,
-        extra_attrs=["consumo_hoy_l", "fecha_ultima_lectura", "estado_ultima_lectura", "contrato", "ultima_actualizacion"],
-    ),
-    EmasesaSensorEntityDescription(
-        key="consumo_ayer_m3",
-        data_key="consumo_ayer_m3",
-        name="EMASESA Consumo Ayer",
-        icon="mdi:water-outline",
-        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
-        device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.TOTAL,
-        extra_attrs=["consumo_ayer_l", "contrato", "ultima_actualizacion"],
-    ),
-    EmasesaSensorEntityDescription(
-        key="lectura_contador_m3",
-        data_key="lectura_contador_m3",
-        name="EMASESA Lectura Contador",
-        icon="mdi:counter",
-        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
-        device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.TOTAL_INCREASING,
-        extra_attrs=["lectura_contador_l", "fecha_ultima_lectura", "contrato", "ultima_actualizacion"],
-    ),
-    EmasesaSensorEntityDescription(
-        key="consumo_total_mes_m3",
-        data_key="consumo_total_mes_m3",
-        name="EMASESA Consumo Total Período",
-        icon="mdi:water-plus",
-        native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
-        device_class=SensorDeviceClass.WATER,
-        state_class=SensorStateClass.TOTAL,
-        extra_attrs=["consumo_total_mes_l", "dias_disponibles", "contrato", "ultima_actualizacion"],
+        extra_attrs=["fecha_ultima_lectura", "contrato", "ultima_actualizacion", "dias_disponibles"],
     ),
     EmasesaSensorEntityDescription(
         key="consumo_medio_diario_m3",
@@ -77,7 +47,37 @@ SENSORS: tuple[EmasesaSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         device_class=SensorDeviceClass.WATER,
         state_class=SensorStateClass.MEASUREMENT,
-        extra_attrs=["consumo_medio_diario_l", "consumo_maximo_dia_m3", "contrato", "ultima_actualizacion"],
+        extra_attrs=["dias_disponibles", "contrato", "ultima_actualizacion"],
+    ),
+    EmasesaSensorEntityDescription(
+        key="estado_contador",
+        data_key="estado_contador",
+        name="EMASESA Estado Contador",
+        icon="mdi:counter",
+        native_unit_of_measurement=None,
+        device_class=None,
+        state_class=None,
+        extra_attrs=["fecha_ultima_lectura", "contrato", "ultima_actualizacion"],
+    ),
+    EmasesaSensorEntityDescription(
+        key="error_contador",
+        data_key="error_contador",
+        name="EMASESA Error Contador",
+        icon="mdi:alert-circle",
+        native_unit_of_measurement=None,
+        device_class=SensorDeviceClass.ENUM,
+        state_class=None,
+        extra_attrs=["fecha_ultima_lectura", "contrato", "ultima_actualizacion"],
+    ),
+    EmasesaSensorEntityDescription(
+        key="consumo_nocturno",
+        data_key="consumo_nocturno",
+        name="EMASESA Consumo Nocturno",
+        icon="mdi:pipe-leak",
+        native_unit_of_measurement=None,
+        device_class=SensorDeviceClass.ENUM,
+        state_class=None,
+        extra_attrs=["fecha_ultima_lectura", "contrato", "ultima_actualizacion"],
     ),
 )
 
@@ -87,7 +87,6 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Configurar sensores EMASESA desde una config entry."""
     coordinator: EmasesaDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
         EmasesaSensor(coordinator, entry, description)
@@ -100,12 +99,7 @@ class EmasesaSensor(CoordinatorEntity[EmasesaDataUpdateCoordinator], SensorEntit
 
     entity_description: EmasesaSensorEntityDescription
 
-    def __init__(
-        self,
-        coordinator: EmasesaDataUpdateCoordinator,
-        entry: ConfigEntry,
-        description: EmasesaSensorEntityDescription,
-    ) -> None:
+    def __init__(self, coordinator, entry, description):
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"emasesa_{entry.data['contrato']}_{description.key}"
@@ -118,7 +112,7 @@ class EmasesaSensor(CoordinatorEntity[EmasesaDataUpdateCoordinator], SensorEntit
         )
 
     @property
-    def native_value(self) -> float | None:
+    def native_value(self) -> Any:
         if self.coordinator.data is None:
             return None
         return self.coordinator.data.get(self.entity_description.data_key)
@@ -135,4 +129,8 @@ class EmasesaSensor(CoordinatorEntity[EmasesaDataUpdateCoordinator], SensorEntit
 
     @property
     def available(self) -> bool:
-        return self.coordinator.last_update_success and self.native_value is not None
+        return (
+            self.coordinator.last_update_success
+            and self.coordinator.data is not None
+            and self.coordinator.data.get(self.entity_description.data_key) is not None
+        )

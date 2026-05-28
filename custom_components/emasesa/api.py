@@ -93,26 +93,32 @@ class EmasesaApiClient:
             raise EmasesaApiError(f"Error HTTP: {err}") from err
 
     def _parse(self, data: list) -> dict:
-        """Parsear respuesta real de EMASESA. Consumo en LITROS."""
+        """
+        Parsear respuesta de EMASESA.
+
+        Devuelve:
+        - Datos para sensores HA
+        - dias_raw: JSON completo para inyectar estadísticas horarias
+        - ultimo_dia: datos del último día válido para sensores de estado
+        """
         result = {
             "contrato": self._contrato,
             "ultima_actualizacion": datetime.now(timezone.utc).isoformat(),
-            "consumo_hoy_l": None,
+            # Sensor consumo hoy
             "consumo_hoy_m3": None,
-            "consumo_ayer_l": None,
-            "consumo_ayer_m3": None,
-            "lectura_contador_l": None,
-            "lectura_contador_m3": None,
-            "consumo_total_mes_l": None,
-            "consumo_total_mes_m3": None,
-            "consumo_medio_diario_l": None,
+            # Sensor media diaria
             "consumo_medio_diario_m3": None,
-            "consumo_maximo_dia_l": None,
-            "consumo_maximo_dia_m3": None,
+            # Sensor estado contador
+            "estado_contador": None,
+            # Sensor error contador
+            "error_contador": None,
+            # Sensor consumo nocturno (posible fuga)
+            "consumo_nocturno": None,
+            # Metadatos
             "fecha_ultima_lectura": None,
-            "estado_ultima_lectura": None,
             "dias_disponibles": 0,
-            "dias_raw": data,  # <-- datos crudos completos para inyectar en recorder
+            # Raw para estadísticas horarias
+            "dias_raw": data,
         }
 
         if not isinstance(data, list) or not data:
@@ -120,39 +126,41 @@ class EmasesaApiClient:
 
         result["dias_disponibles"] = len(data)
 
-        dias_ok = [
+        # Días con datos completos OK
+        dias_ok = [d for d in data if d.get("estado") == "OK"]
+
+        # Último día con datos válidos (OK o PARCIAL con índice)
+        dias_validos = [
             d for d in data
             if d.get("estado") in ("OK", "PARCIAL") and d.get("indice") is not None
         ]
 
-        if dias_ok:
-            ultimo = dias_ok[-1]
+        if dias_validos:
+            ultimo = dias_validos[-1]
             result["fecha_ultima_lectura"] = ultimo.get("fecha")
-            result["estado_ultima_lectura"] = ultimo.get("estado")
 
-            indice = ultimo.get("indice")
-            if indice is not None:
-                result["lectura_contador_l"] = indice
-                result["lectura_contador_m3"] = round(indice / 1000, 3)
-
-            consumo_hoy = ultimo.get("consumo", 0)
-            result["consumo_hoy_l"] = consumo_hoy
+            # Consumo hoy en m³
+            consumo_hoy = ultimo.get("consumo", 0) or 0
             result["consumo_hoy_m3"] = round(consumo_hoy / 1000, 3)
 
-            if len(dias_ok) >= 2:
-                consumo_ayer = dias_ok[-2].get("consumo", 0)
-                result["consumo_ayer_l"] = consumo_ayer
-                result["consumo_ayer_m3"] = round(consumo_ayer / 1000, 3)
+            # Estado del contador del último día
+            result["estado_contador"] = ultimo.get("estado")
 
-        dias_completos = [d for d in data if d.get("estado") == "OK"]
-        if dias_completos:
-            consumos = [d.get("consumo", 0) for d in dias_completos]
+            # Error en la lectura
+            result["error_contador"] = bool(ultimo.get("erroneo", False))
+
+            # Consumo nocturno — true si alguna hora tiene nocturno=true
+            detalle = ultimo.get("detalle", [])
+            result["consumo_nocturno"] = any(
+                h.get("nocturno", False) for h in detalle
+            )
+
+        # Media diaria sobre días OK completos
+        if dias_ok:
+            consumos = [d.get("consumo", 0) or 0 for d in dias_ok]
             total = sum(consumos)
-            result["consumo_total_mes_l"] = total
-            result["consumo_total_mes_m3"] = round(total / 1000, 3)
-            result["consumo_medio_diario_l"] = round(total / len(consumos), 1)
-            result["consumo_medio_diario_m3"] = round(total / len(consumos) / 1000, 3)
-            result["consumo_maximo_dia_l"] = max(consumos)
-            result["consumo_maximo_dia_m3"] = round(max(consumos) / 1000, 3)
+            result["consumo_medio_diario_m3"] = round(
+                total / len(consumos) / 1000, 3
+            )
 
         return result

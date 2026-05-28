@@ -4,9 +4,9 @@
   "codeowners": [],
   "config_flow": true,
   "dependencies": ["recorder"],
-  "documentation": "https://github.com/Gracarpes/ha-emasesa",
+  "documentation": "https://github.com/gcarpes/ha-emasesa",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/Gracarpes/ha-emasesa/issues",
+  "issue_tracker": "https://github.com/gcarpes/ha-emasesa/issues",
   "requirements": [],
-  "version": "1.1.0"
+  "version": "1.2.0"
 }
